@@ -1,10 +1,10 @@
-var Table = require('./table');
 
 module['exports'] = function priceChangeUpdate (hook) {
   console.log(hook.params);
-
+  
   var request = require('request');
   const cheerio = require('cheerio');
+  var Table = require('./table');
   var $ = cheerio.load(hook.params.text);
   var output = '```md\n';
 
