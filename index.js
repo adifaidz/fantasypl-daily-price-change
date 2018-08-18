@@ -1,9 +1,10 @@
+var Table = require('./table');
+
 module['exports'] = function priceChangeUpdate (hook) {
   console.log(hook.params);
 
   var request = require('request');
   const cheerio = require('cheerio');
-  var Table = require('easy-table');
   var $ = cheerio.load(hook.params.text);
   var output = '```md\n';
 
@@ -24,7 +25,7 @@ module['exports'] = function priceChangeUpdate (hook) {
         table.cell('Diff', $(cells[6]).text());
         table.newRow();
       });
-      output += table.toString();
+      output += table.toString() + '\n\n';
   });
 
   output += '```';
@@ -47,7 +48,7 @@ module['exports'] = function priceChangeUpdate (hook) {
   };
 
   console.log(content);
-
+  // hook.res.end(hook.env);
   return request.post({
     url: 'https://discordapp.com/api/webhooks/' + hook.env.discord_webhook_id,
     body : content,
