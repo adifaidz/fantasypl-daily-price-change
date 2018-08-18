@@ -1,4 +1,4 @@
-var clone = require('./../clone/clone');
+var clone = require('./../clone/clone.js');
 
 module.exports = function(options, defaults) {
   options = options || {};

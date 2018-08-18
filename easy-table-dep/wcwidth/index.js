@@ -1,7 +1,7 @@
 "use strict"
 
-var defaults = require('./../defaults/index')
-var combining = require('./combining')
+var defaults = require('./../defaults/index.js')
+var combining = require('./combining.js')
 
 var DEFAULTS = {
   nul: 0,

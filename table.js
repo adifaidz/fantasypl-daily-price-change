@@ -1,8 +1,8 @@
-var ansiRegex = require('./easy-table-dep/ansi-regex/index')
+var ansiRegex = require('./easy-table-dep/ansi-regex/index.js')
 var wcwidth
 
 try {
-  wcwidth = require('./easy-table-dep/wcwidth/index')
+  wcwidth = require('./easy-table-dep/wcwidth/index.js')
 } catch(e) {}
 
 module.exports = Table
