@@ -1,11 +1,9 @@
-// A simple hello world microservice 
-// Click "Deploy Service" to deploy this code
-// Service will respond to HTTP requests with a string
-module['exports'] = function helloWorld (hook) {
+module['exports'] = function priceChangeUpdate (hook) {
   console.log(hook.params);
 
   var request = require('request');
   const cheerio = require('cheerio');
+  var Table = require('easy-table');
   var $ = cheerio.load(hook.params.text);
   var output = '```md\n';
 
@@ -13,23 +11,22 @@ module['exports'] = function helloWorld (hook) {
       var rows = $($('table>tbody')[i]).find('tr');
       var sign = i % 2 === 0 ? ' ⬆ ' : ' ⬇ ';
       
-      output += '# ' + $(header).text() + ' #:\n';
-
+      output += '# ' + $(header).text() + ' #:\n\n';
+      var table = new Table;
       rows.each(function(i, row){
         var cells = $(row).find('td');
-        var name = $(cells[0]).text();
-        var team = $(cells[1]).text();
-        var newprice = $(cells[5]).text();
-        // var position = $(cells[2]).text();
-        // var ownership = $(cells[3]).text();
-        // var oldprice = $(cells[4]).text();
-        // var diff = $(cells[6]).text();
-
-        output += name + ' ('+team+') ' + sign + newprice + '\n';
+        table.cell('Name', $(cells[0]).text());
+        table.cell('Team', $(cells[1]).text());
+        table.cell('Position', $(cells[2]).text());
+        table.cell('Ownership', $(cells[3]).text());
+        table.cell('Old Price', $(cells[4]).text());
+        table.cell('New Price', $(cells[5]).text());
+        table.cell('Diff', $(cells[6]).text());
+        table.newRow();
       });
-
-      output += '\n\n';
+      output += table.toString();
   });
+
   output += '```';
 
   var content = {
