@@ -4,7 +4,7 @@ module['exports'] = function priceChangeUpdate (hook) {
   
   var request = require('request');
   const cheerio = require('cheerio');
-  var Table = require('./table.js');
+  var Table = require('easy-table');
   var $ = cheerio.load(hook.params.text);
   var output = '```md\n';
 
