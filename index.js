@@ -1,4 +1,4 @@
-var request = require('request');
+var axios = require('axios');
 const cheerio = require('cheerio');
 var Table = (function () {
   var ansiRegex = (function () {
@@ -893,9 +893,8 @@ var Table = (function () {
 })();
 
 module['exports'] = function priceChangeUpdate(hook) {
-  console.log(hook.params);
   var $ = cheerio.load(hook.params.text);
-  var output = '```md\n';
+  var output = '';
 
   $('h3').each(function (i, header) {
     var rows = $($('table>tbody')[i]).find('tr');
@@ -907,22 +906,27 @@ module['exports'] = function priceChangeUpdate(hook) {
       var cells = $(row).find('td');
       table.cell('Name', $(cells[0]).text());
       table.cell('Team', $(cells[1]).text());
-      table.cell('Position', $(cells[2]).text());
-      table.cell('Ownership', $(cells[3]).text());
-      table.cell('Old Price', $(cells[4]).text());
-      table.cell('New Price', $(cells[5]).text());
-      table.cell('Diff', $(cells[6]).text());
+      table.cell('Pos', $(cells[2]).text().substring(0, 3));
+      table.cell('Own %', $(cells[3]).text().replace(/%/g, ''));
+      table.cell('Old', $(cells[4]).text().replace(/[Â£]/g, ''));
+      table.cell('New', $(cells[5]).text().replace(/[Â£]/g, ''));
+      table.cell('Diff', $(cells[6]).text().replace(/[-+Â£]/g, ''));
       table.newRow();
     });
     output += table.toString() + '\n\n';
   });
 
-  output += '```';
+  output = '```md\n' + output + '```';
+  console.log(output);
+  console.log("Length: " + output.length);
+  sendToDiscord(output);
+};
 
+function sendToDiscord(table) {
   var content = {
     "username": "FPL Updates",
     "avatar_url": "https://fantasy.premierleague.com/static/libsass/plfpl/dist/img/facebook-share.png",
-    "content": output,
+    "content": table,
     "embeds": [{
       "title": hook.params.title,
       "url": hook.params.url,
@@ -934,18 +938,11 @@ module['exports'] = function priceChangeUpdate(hook) {
     }]
   };
 
-  console.log(content);
-  // hook.res.end(hook.env);
-  return request.post({
-    url: 'https://discordapp.com/api/webhooks/' + hook.env.discord_webhook_id,
-    body: content,
-    json: true
-  }, function (err, res, body) {
-    if (err) {
-      console.log("Error : " + err.message);
-      return hook.res.end(err.messsage);
-    }
-    console.log("Success");
-    hook.res.end(body);
+  axios.post('https://discordapp.com/api/webhooks/' + hook.env.discord_webhook_id, content).then(function (response) {
+    console.log(response);
+    hook.res.end(response);
+  }).catch(function (error) {
+    console.log(error.response);
+    hook.res.end(error.response);
   });
-};
+}
