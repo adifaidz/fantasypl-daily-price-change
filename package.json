@@ -13,5 +13,6 @@
     "microcule": "*",
     "request": "^2.88.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {}
 }
